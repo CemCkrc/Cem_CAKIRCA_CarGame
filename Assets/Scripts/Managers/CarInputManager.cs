@@ -20,14 +20,17 @@ namespace CARGAME.Managers
                     cars[i].GetComponent<MeshRenderer>().enabled = false;
 
                 _currentControllingCar = value;
-                controlledCars++;
-                if(value > 8)
+                if(value == 8)
                 {
                     GameManager.Manager.OnLevelCompleted();
                     return;
                 } 
-                
-                cars[_currentControllingCar].GetComponent<MeshRenderer>().enabled = true;
+                else
+                {
+                    controlledCars++;
+                    cars[_currentControllingCar].GetComponent<MeshRenderer>().enabled = true;
+                }
+
             }
         }
 
