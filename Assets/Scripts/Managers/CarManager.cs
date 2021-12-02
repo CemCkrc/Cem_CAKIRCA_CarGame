@@ -1,10 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using CARGAME.Inputs;
+using CARGAME.Cars;
+
 namespace CARGAME.Managers
 {
-    public class CarInputManager : MonoBehaviour, IInputs
+    public class CarManager : MonoBehaviour, IInputs
     {
         [Range(1,8)]
         public int controlledCars = 1;
@@ -35,16 +37,28 @@ namespace CARGAME.Managers
         }
 
         private bool _isStarted = false;
-        private List<CARGAME.CarController> cars;
-        public CARGAME.CarSpawner[] carSpawners;
+        private List<CarController> cars;
+        private  List<CarSpawner> carSpawners;
         private ROTATION inputRotation = ROTATION.NONE;
 
         private int _currentControllingCar = 0;
 
-        private void Awake() => _currentControllingCar = controlledCars - 1;
+        private void Awake()
+        {
+            carSpawners = new List<CarSpawner>();
+            cars = new List<CarController>();
+
+            _currentControllingCar = controlledCars - 1;
+        }
+
         private void Start() 
         {
-            cars = new List<CARGAME.CarController>();
+            foreach(CarSpawner spawner in FindObjectsOfType<CarSpawner>())
+            {
+                carSpawners.Add(spawner);
+            }
+
+            carSpawners.Sort((car0,car1)=>car0.carID.CompareTo(car1.carID));
 
             foreach (CarSpawner item in carSpawners)
             {
@@ -102,9 +116,13 @@ namespace CARGAME.Managers
             SetSpawner();
             
             for(int i = 0; i < controlledCars; i++)
-                cars[i].IsStarted = false;
+            {
 
-            for(int i = 0; i < carSpawners.Length; i++)
+                cars[i].gameObject.SetActive(true);
+                cars[i].IsStarted = false;
+            }
+
+            for(int i = 0; i < carSpawners.Capacity; i++)
                 carSpawners[i].ResetCar();
         }
 
@@ -113,9 +131,18 @@ namespace CARGAME.Managers
             for(int i = 0; i < 8; i++) //max cars
             {
                 if(_currentControllingCar == i)
-                    carSpawners[i].SetVisibility(true);
+                {
+                    carSpawners[i].SetVisibility(true, true);
+                    cars[i].gameObject.SetActive(true);
+                    //carSpawners[i].SetSpawnerVisibility(true);
+                }
                 else
-                    carSpawners[i].SetVisibility(false);
+                {
+                    carSpawners[i].SetVisibility(false, false);
+                    cars[i].gameObject.SetActive(false);
+                    //carSpawners[i].SetSpawnerVisibility(false);
+                }
+                    
             }
         }
 

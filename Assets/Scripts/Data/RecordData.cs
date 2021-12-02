@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -78,5 +76,12 @@ public class RecordData : MonoBehaviour
             rotationData.Add(_recordedObject.rotation);
             endFrame++;
         }
+    }
+
+    struct Data
+    {
+        List<Vector3> positionData;
+
+        List<Quaternion> rotationData;
     }
 }

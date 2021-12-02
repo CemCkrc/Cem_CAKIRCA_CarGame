@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,9 +7,9 @@ namespace CARGAME.Managers
     {
         public static RecordManager Recorder;
 
-        Dictionary<int,RecordData> recordDatas;
+        private Dictionary<int,RecordData> _recordDatas;
 
-        [SerializeField] private RecordData data;
+        [SerializeField] private RecordData _dataPrefab;
 
         private void Awake()
         {
@@ -20,57 +18,57 @@ namespace CARGAME.Managers
             else
                 Destroy(this.gameObject);
 
-            recordDatas = new Dictionary<int,RecordData>();
+            _recordDatas = new Dictionary<int,RecordData>();
         }
 
         public void CreateRecordData(int recordID, Transform recordObject)
         {
-            RecordData createdData = Instantiate(data, Vector3.zero, Quaternion.identity, this.transform);
+            RecordData createdData = Instantiate(_dataPrefab, Vector3.zero, Quaternion.identity, this.transform);
             createdData.SetRecordData(recordID, recordObject);
 
-            recordDatas.Add(recordID, createdData);
+            _recordDatas.Add(recordID, createdData);
         }
 
         public void StartRecording(int recordID)
         {
-            if (recordDatas.ContainsKey(recordID)) recordDatas[recordID].StartRecording();
+            if (_recordDatas.ContainsKey(recordID)) _recordDatas[recordID].StartRecording();
         }
 
         public void StopRecording(int recordID)
         {
-            if (recordDatas.ContainsKey(recordID)) recordDatas[recordID].StopRecording();
+            if (_recordDatas.ContainsKey(recordID)) _recordDatas[recordID].StopRecording();
         }
 
         public void PlayReplay(int recordID, Transform recordedObject)
         {
-            if (recordDatas.ContainsKey(recordID))
+            if (_recordDatas.ContainsKey(recordID))
             {
                 recordedObject.GetComponent<MeshRenderer>().enabled = true;
-                recordDatas[recordID].StartReplay(recordedObject);
+                _recordDatas[recordID].StartReplay(recordedObject);
             } 
         }
 
         public void StopReplay(int recordID)
         {
-            if (recordDatas.ContainsKey(recordID)) recordDatas[recordID].StopReplay();
+            if (_recordDatas.ContainsKey(recordID)) _recordDatas[recordID].StopReplay();
         }
 
         public void ResetAllRecords()
         {
-            foreach (var item in recordDatas)
+            foreach (var item in _recordDatas)
             {
                 item.Value.ResetReplay();
             }
-            Debug.Log(recordDatas.Count);
+            Debug.Log(_recordDatas.Count);
         }
 
         public void DestroyReplay(int recordID)
         {
-            RecordData item = recordDatas[recordID];
+            RecordData item = _recordDatas[recordID];
 
             if(item != null)
             {
-                recordDatas.Remove(recordID);
+                _recordDatas.Remove(recordID);
                 Destroy(item.gameObject);
                 return;
             }

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7379373197179418788}
   - component: {fileID: 7379373197179418784}
   m_Layer: 7
-  m_Name: Car_2
+  m_Name: CarSamplePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 87cdfe872b3445245bbb4f86fda618a2, type: 2}
+  - {fileID: 2100000, guid: 9ae9d8523853255469c62c57ab5ac4d3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f686429a450288448fe269dcf8b6d9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carID: 2
-  carSpeed: 75
+  carID: 0
+  carSpeed: 100
   rotationSpeed: 100
   isRunningReplay: 0

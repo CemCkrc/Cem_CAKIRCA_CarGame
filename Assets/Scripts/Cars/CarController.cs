@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace CARGAME
+namespace CARGAME.Cars
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class CarController : MonoBehaviour
     {
         [Header("Car Stats")]

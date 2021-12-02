@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,10 +18,10 @@ namespace CARGAME.Managers
             if (!Manager)
             {
                 Manager = this;
-                DontDestroyOnLoad(this.gameObject);
+                DontDestroyOnLoad(this.transform.root.gameObject);
             }
             else
-                Destroy(this.gameObject);
+                Destroy(this.transform.root.gameObject);
 
             currentLevel = PlayerPrefs.GetInt("LevelID");
 
@@ -44,14 +42,14 @@ namespace CARGAME.Managers
 
         public void OnCarReachedExit()
         {
-            FindObjectOfType<CarInputManager>().CurrentControllingCar++;
-            FindObjectOfType<CarInputManager>().ResetAllCars();
+            FindObjectOfType<CarManager>().CurrentControllingCar++;
+            FindObjectOfType<CarManager>().ResetAllCars();
             RecordManager.Recorder.ResetAllRecords();
         }
 
         public void OnCarFailed()
         {
-            FindObjectOfType<CarInputManager>().ResetAllCars();
+            FindObjectOfType<CarManager>().ResetAllCars();
             RecordManager.Recorder.ResetAllRecords();
             //SceneManager.LoadScene(currentLevel);
         }

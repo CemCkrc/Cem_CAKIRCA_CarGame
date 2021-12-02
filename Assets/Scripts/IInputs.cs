@@ -1,4 +1,4 @@
-namespace CARGAME
+namespace CARGAME.Inputs
 {
     public interface IInputs
     {
