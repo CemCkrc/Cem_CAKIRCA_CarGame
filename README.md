@@ -13,5 +13,5 @@
   In Editor mode, you must add Managers and input controls prefab into your scene. You can add your car spawner prefab as many as you want. The game finds all spawners in the scene before starts and sets the number of cars. After that, the game spawns cars via using spawner ID.
   You can add a moveable obstacle.
 ## Compatibility
--Tested for Android (Android version 11)
--Unity 2020.3.23f1
+Tested for Android (Android version 11) - 
+Unity 2020.3.23f1
