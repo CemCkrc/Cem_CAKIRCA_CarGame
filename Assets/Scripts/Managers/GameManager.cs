@@ -5,19 +5,18 @@ namespace CARGAME.Managers
 {
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Manager;
+        public static GameManager Instance; //GameManager Singleton
 
-        public int currentLevel
-        {
-            get;
-            private set;
-        } = 0;
+        [Tooltip("Set false for test level")]
+        public bool loadLastPlayedScene = true; //Set false for editor
+
+        private int currentLevel = 0; //Player current level index
 
         private void Awake()
         {
-            if (!Manager)
+            if (!Instance)
             {
-                Manager = this;
+                Instance = this;
                 DontDestroyOnLoad(this.transform.root.gameObject);
             }
             else
@@ -25,35 +24,54 @@ namespace CARGAME.Managers
 
             currentLevel = PlayerPrefs.GetInt("LevelID");
 
-            if(currentLevel != SceneManager.GetActiveScene().buildIndex)
+            if(loadLastPlayedScene && currentLevel != SceneManager.GetActiveScene().buildIndex) //Check player in current level
                 LoadGameLevel();
         }
 
+        /// <summary>
+        /// Load next level if player's all cars to target
+        /// </summary>
         public void OnLevelCompleted()
         {
+            if(!loadLastPlayedScene) LoadGameLevel();
+
             currentLevel++;
+
+            if(currentLevel >= SceneManager.sceneCountInBuildSettings) //Load first level if all levels played
+                currentLevel = 0;
+            
             PlayerPrefs.SetInt("LevelID", currentLevel);
 
-            if(currentLevel > 0)
-                currentLevel = 0;
-                
             LoadGameLevel();
         }
 
+        /// <summary>
+        /// Load next car if player's car reached target
+        /// </summary>
         public void OnCarReachedExit()
         {
-            FindObjectOfType<CarManager>().CurrentControllingCar++;
-            FindObjectOfType<CarManager>().ResetAllCars();
+            foreach (var item in FindObjectsOfType<Obstacles.MovingObstacle>())
+                item.ResetPosition();
+
             RecordManager.Recorder.ResetAllRecords();
+            FindObjectOfType<CarManager>().CurrentControllingCar++;    
         }
 
+        /// <summary>
+        /// Respawn current player car and previous records
+        /// </summary>
         public void OnCarFailed()
         {
-            FindObjectOfType<CarManager>().ResetAllCars();
+            foreach (var item in FindObjectsOfType<Obstacles.MovingObstacle>())
+                item.ResetPosition();
+
             RecordManager.Recorder.ResetAllRecords();
-            //SceneManager.LoadScene(currentLevel);
+            FindObjectOfType<CarManager>().ResetAllCars();  
         }
 
-        private void LoadGameLevel() { if(SceneManager.sceneCount > currentLevel) SceneManager.LoadScene(currentLevel); }
+        /// <summary>
+        /// Load player level
+        /// </summary>
+        private void LoadGameLevel() { if(SceneManager.sceneCountInBuildSettings > currentLevel) SceneManager.LoadScene(currentLevel); }
     }
 }

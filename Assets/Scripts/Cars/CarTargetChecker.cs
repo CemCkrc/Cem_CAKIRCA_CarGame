@@ -2,22 +2,19 @@ using UnityEngine;
 
 namespace CARGAME.Cars
 {
+    /// <summary>
+    /// Check if player's car reached the target
+    /// </summary>
     public class CarTargetChecker : MonoBehaviour
     {
-        private int _carID;
-
-        public int CarID
-        {
-            get => _carID;
-            set { _carID = value; }
-        }
+        public int carID; //Store carID
 
         private void OnTriggerEnter(Collider other) 
         {
             CarController car = other.GetComponent<CarController>();
 
-            if(car?.carID == _carID)
-                Managers.GameManager.Manager.OnCarReachedExit();
+            if(car?.carID == this.carID)
+                Managers.GameManager.Instance.OnCarReachedExit();
         }
     }
 }

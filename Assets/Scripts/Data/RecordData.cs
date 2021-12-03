@@ -1,87 +1,124 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RecordData : MonoBehaviour
+namespace CARGAME.GameData
 {
-    public int recordID
+    public class RecordData : MonoBehaviour
     {
-        get;
-        private set;
-    } = 0;
+        #region  Public Values
+            public int currentFrame = 0; //Current Frame
+            public int endFrame = 0; //End frame
 
-    public int currentFrame = 0;
-    public int endFrame = 0;
+        #endregion
 
+        #region  Private Values
 
-    public List<Vector3> positionData;
+            private Data _data; //Store recorded data
+            private Transform _recordedObject; //Recorded object
 
-    public List<Quaternion> rotationData;
+            private bool _isRecording = false; //True if object is recording
+            private bool _isReplaying = false; //True if object is replaying
+            private bool _isDataCreated = false; //Check if record data created
 
-    private Transform _recordedObject;
-    private bool _isRecording = false;
-    private bool _isReplaying = false;
+        #endregion
 
-    public void StartRecording()
-    {
-        _isRecording = true;
-    }
-
-    public void SetRecordData(int recordID, Transform recordedObject)
-    {
-        this.recordID = recordID;
-        _recordedObject = recordedObject;
-        positionData = new List<Vector3>();
-        rotationData = new List<Quaternion>();
-    }
-
-    public void StopRecording()
-    {
-        _isRecording = false;
-    }
-
-    public void StartReplay(Transform recordedObject)
-    {
-        _recordedObject = recordedObject;
-        _isReplaying = true;
-    }
-
-    public void StopReplay()
-    {
-        _isReplaying = false;
-    }
-
-    public void ResetReplay()
-    {
-        currentFrame = 0;
-        _isReplaying = false;
-        _isRecording = false;
-
-        /*if(_recordedObject)
+        /// <summary>
+        /// Create data for record
+        /// </summary>
+        /// <param name="recordID"> ID for created data </param>
+        /// <param name="recordedObject"> Object transform for record position and rotation </param>
+        public void CreateRecordData(int recordID, Transform recordedObject)
         {
-            _recordedObject.position = positionData[0];
-            _recordedObject.rotation = rotationData[0];
-        }*/
-    }
-    private void FixedUpdate() 
-    {
-        if(_isReplaying && currentFrame != endFrame)
-        {
-            _recordedObject.transform.position = positionData[currentFrame];
-            _recordedObject.transform.rotation = rotationData[currentFrame];
-            currentFrame++;
+            _isDataCreated = true;
+            
+            _recordedObject = recordedObject;
+
+            _data.DataID = recordID;
+            _data.positionData = new List<Vector3>();
+            _data.rotationData = new List<Quaternion>();
         }
-        else if(_isRecording)
+        
+        /// <summary>
+        /// Start record
+        /// </summary>
+        public void StartRecording()
         {
-            positionData.Add(_recordedObject.position);
-            rotationData.Add(_recordedObject.rotation);
-            endFrame++;
+            if(!_isDataCreated)
+            {
+                ThrowDataNotCreatedError();
+                return;
+            }
+
+            _isRecording = true;
         }
+        
+        /// <summary>
+        /// Stop record
+        /// </summary>
+        public void StopRecording()
+        {
+            _isRecording = false;
+
+            if(endFrame > 1000) ThrowFrameSizeError(); 
+        }
+
+        /// <summary>
+        /// Start replay
+        /// </summary>
+        /// <param name="recordedObject"> Override recordedObject position and rotation via using data </param>
+        public void StartReplay(Transform recordedObject)
+        {
+            if(!_isDataCreated)
+            {
+                ThrowDataNotCreatedError();
+                return;
+            }
+
+            _recordedObject = recordedObject;
+            _isReplaying = true;
+        }
+
+        /// <summary>
+        /// Stop replay
+        /// </summary>
+        public void StopReplay() => _isReplaying = false;
+        
+        /// <summary>
+        /// Return to first frame and stops
+        /// </summary>
+        public void ResetReplay()
+        {
+            currentFrame = 0;
+            _isReplaying = false;
+            _isRecording = false;
+        }
+        
+        private void FixedUpdate()
+        {
+            if (_isReplaying && currentFrame < endFrame) //Replay data
+            {
+                _recordedObject.transform.position = _data.positionData[currentFrame];
+                _recordedObject.transform.rotation = _data.rotationData[currentFrame];
+                currentFrame++;
+            }
+            else if (_isRecording) //Record data
+            {
+                _data.positionData.Add(_recordedObject.position);
+                _data.rotationData.Add(_recordedObject.rotation);     
+                endFrame++;
+            }
+        }
+
+        private void ThrowDataNotCreatedError() => Debug.LogError($"Record data not created.");
+        private void ThrowFrameSizeError() => Debug.LogWarning($"Recorded data frame count bigger than 1000.");
     }
 
-    struct Data
+    struct Data //Data struct for store record
     {
-        List<Vector3> positionData;
+        public int DataID; //Record Data unique ID
 
-        List<Quaternion> rotationData;
+        public List<Vector3> positionData; //Record Data positions list
+
+        public List<Quaternion> rotationData; //Record Data rotations list
     }
 }

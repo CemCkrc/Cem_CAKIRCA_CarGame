@@ -4,65 +4,99 @@ namespace CARGAME.Cars
 {
     public class CarSpawner : MonoBehaviour
     {
-        [Header("Spawner Values")]
-        public int spawnerID = 0;
+        #region Public Values
 
-        
+        [Header("Spawner Values")]
+        [Tooltip("Must be a unique ID")]
+        public int spawnerID = 0; //Unique spawnerID
+
+
         [Space(2)]
         [Header("Car Values")]
-        public int carID = 0;
-        public float carSpeed = 0;
-        public float carRotationSpeed = 0;
+        [Tooltip("Record data via using unique ID")]
+        public int carID = 0; //CarID
+        public float carSpeed = 0; //Car speed
+        public float carRotationSpeed = 0; //Car rotationSpeed
 
         [Space(10)]
-        public CarController carPrefab;
-        public CarController spawnedCar
+        public CarController carPrefab; //Car prefab
+        public CarController spawnedCar //Spawned car
         {
             get;
             private set;
         }
 
-        [SerializeField] Color _normalCarColor;
-        [SerializeField] Color _currentCarColor;
+        #endregion
 
-        private Transform startPos;
-        private CarTargetChecker endPos;
+        #region Private Values
+
+        [SerializeField] private Color _normalCarColor;
+        [SerializeField] private Color _currentCarColor;
+
+        private Transform _entrancePos;
+        private CarTargetChecker _endPos;
+        private MeshRenderer _carMeshRenderer;
+
+        #endregion
 
         private void Awake()
         {
-            endPos = GetComponentInChildren<CarTargetChecker>();
-            startPos = transform.Find("StartPos");
+            _entrancePos = transform.Find("EntrancePos");
+            _endPos = GetComponentInChildren<CarTargetChecker>();
 
-            spawnedCar = Instantiate(carPrefab, startPos.position, startPos.rotation, null);
+            spawnedCar = Instantiate(carPrefab, _entrancePos.position, _entrancePos.rotation, null);
 
-            endPos.CarID = carID;
-
-            SetupCar();
+            SetupSpawner();
         }
 
-        private void SetupCar()
+        private void Start() 
         {
+            // Activate entrance and target meshes
+            _entrancePos.GetChild(0).gameObject.SetActive(true);
+            _endPos.transform.GetChild(0).gameObject.SetActive(true);
+        }
+        
+        /// <summary>
+        /// Spawner Setup
+        /// </summary>
+        private void SetupSpawner()
+        {
+            _endPos.carID = carID;
+
             spawnedCar.carID = this.carID;
             spawnedCar.carSpeed = this.carSpeed;
             spawnedCar.rotationSpeed = this.carRotationSpeed;
+
+            
+            _carMeshRenderer = spawnedCar.GetComponent<MeshRenderer>();
         }
 
+        /// <summary>
+        /// Set car and entrance-target visibility in game
+        /// Change car color if car is controlling by player
+        /// </summary>
+        /// <param name="carVisibility"> Car visible/invisible </param>
+        /// <param name="spawnerVisibility"> Entrance-target visible/invisible </param>
         public void SetVisibility(bool carVisibility, bool spawnerVisibility)
         {
-            startPos.gameObject.SetActive(spawnerVisibility);
-            endPos.transform.gameObject.SetActive(spawnerVisibility);
+            _entrancePos.gameObject.SetActive(spawnerVisibility);
+            _endPos.transform.gameObject.SetActive(spawnerVisibility);
 
-            Color carColor = carVisibility ? _currentCarColor : _normalCarColor;
-
-            if(spawnedCar) spawnedCar.GetComponent<MeshRenderer>().material.color = carColor;
+            Color carColor = spawnerVisibility ? _currentCarColor : _normalCarColor; //Check if player controlling current car
+            _carMeshRenderer.material.color = carColor;
+            
+            spawnedCar.gameObject.SetActive(carVisibility);
         }
 
+        /// <summary>
+        /// Set car position to entrance point
+        /// </summary>
         public void ResetCar()
         {
-            if(!spawnedCar) return;
-            
-            spawnedCar.transform.position = startPos.position;
-            spawnedCar.transform.rotation = startPos.rotation;
+            if (!spawnedCar) return;
+
+            spawnedCar.transform.position = _entrancePos.position;
+            spawnedCar.transform.rotation = _entrancePos.rotation;
         }
-    }   
+    }
 }

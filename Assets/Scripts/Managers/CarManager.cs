@@ -8,150 +8,137 @@ namespace CARGAME.Managers
 {
     public class CarManager : MonoBehaviour, IInputs
     {
-        [Range(1,8)]
-        public int controlledCars = 1;
-
-        public int CurrentControllingCar
+        public int CurrentControllingCar // Encapsulated Player's current car
         {
             get => _currentControllingCar;
             set 
             {
-                cars[_currentControllingCar].isRunningReplay = true;
-
-                for(int i = 0; i < controlledCars; i++)
-                    cars[i].GetComponent<MeshRenderer>().enabled = false;
-
-                _currentControllingCar = value;
-                if(value == 8)
+                if(value == _maxCars) // All cars reached target
                 {
-                    GameManager.Manager.OnLevelCompleted();
+                    GameManager.Instance.OnLevelCompleted();
                     return;
-                } 
-                else
-                {
-                    controlledCars++;
-                    cars[_currentControllingCar].GetComponent<MeshRenderer>().enabled = true;
                 }
-
+                else // Set next car ready
+                {
+                    carSpawners[_currentControllingCar].spawnedCar.isRunningReplay = true;
+                    _currentControllingCar = value;
+                    _controlledCars++;
+                    ResetAllCars();
+                }
             }
         }
 
-        private bool _isStarted = false;
-        private List<CarController> cars;
-        private  List<CarSpawner> carSpawners;
-        private ROTATION inputRotation = ROTATION.NONE;
+        private bool _isStarted = false; // Is player touched?
+        private  List<CarSpawner> carSpawners; // All car spawners
 
-        private int _currentControllingCar = 0;
+        private int _maxCars = 0; // Store number of cars in level
+        private int _controlledCars = 1; // Store played number of cars
+        private int _currentControllingCar = 0; // Player's current car
+
+        private ROTATION inputRotation = ROTATION.NONE; // Rotation data
+        private bool _leftButtonPressed = false; // Left rotation
+        private bool _rightButtonPressed = false; // Right rotation
 
         private void Awake()
         {
             carSpawners = new List<CarSpawner>();
-            cars = new List<CarController>();
 
-            _currentControllingCar = controlledCars - 1;
+            _currentControllingCar = _controlledCars - 1;
         }
 
-        private void Start() 
+        private void Start()
         {
-            foreach(CarSpawner spawner in FindObjectsOfType<CarSpawner>())
-            {
+            foreach(CarSpawner spawner in FindObjectsOfType<CarSpawner>()) // Get all carSpawners
                 carSpawners.Add(spawner);
-            }
 
-            carSpawners.Sort((car0,car1)=>car0.carID.CompareTo(car1.carID));
+            carSpawners.Sort((car0,car1)=>car0.carID.CompareTo(car1.carID)); // Sort list by spawnerID
 
-            foreach (CarSpawner item in carSpawners)
-            {
-                cars.Add(item.spawnedCar);
-            }
-        
-            SetSpawner();
+            _maxCars = carSpawners.Count;
 
-            cars[_currentControllingCar].GetComponent<MeshRenderer>().enabled = true;
+            ResetAllCars();
         }
 
         private void Update() 
         {
             if(!_isStarted) return;
 
-            cars[_currentControllingCar]?.RotateCar(inputRotation);
+            inputRotation = ROTATION.NONE;
+
+            if(_leftButtonPressed && _rightButtonPressed) //Check button press
+                inputRotation = ROTATION.NONE;
+            else if(_leftButtonPressed)
+                inputRotation = ROTATION.LEFT;
+            else if(_rightButtonPressed)
+                inputRotation = ROTATION.RIGHT;
+
+            carSpawners[_currentControllingCar].spawnedCar?.RotateCar(inputRotation);
         }
     
+        #region Player Input Functions
+
         public void TurnLeftButtonPressed()
         {
             if(!_isStarted) StartAllCars();
 
-             if(inputRotation == ROTATION.RIGHT) 
-                inputRotation = ROTATION.NONE;
-            else
-                inputRotation = ROTATION.LEFT;
+            _leftButtonPressed = true;
         }
 
         public void TurnRightButtonPressed()
         {
             if(!_isStarted) StartAllCars();
 
-            if(inputRotation == ROTATION.LEFT) 
-                inputRotation = ROTATION.NONE;
-            else
-                inputRotation = ROTATION.RIGHT;
+            _rightButtonPressed = true;
         }
 
-        //TODO: change old rotation
-        public void ButtonRelased() => inputRotation = ROTATION.NONE;
+        public void TurnLeftButtonRelased() => _leftButtonPressed = false;
 
-       
+        public void TurnRightButtonRelased() => _rightButtonPressed = false;
+
+        #endregion
+
+        /// <summary>
+        /// Start all previously driven cars
+        /// </summary>
         public void StartAllCars()
         {
             _isStarted = true;
 
-            for(int i = 0; i < controlledCars; i++)
-                cars[i].IsStarted = true;
+            for(int i = 0; i < _controlledCars; i++)
+            {
+                if(_currentControllingCar != i)
+                    carSpawners[i].SetVisibility(true, false);
+
+                carSpawners[i].spawnedCar.IsStarted = true;
+            }
+
+            foreach (var item in FindObjectsOfType<Obstacles.MovingObstacle>())
+                item.StartObstacle();
         }
 
+        /// <summary>
+        /// Reset all cars
+        /// </summary>
         public void ResetAllCars()
         {
             _isStarted = false;
 
-            SetSpawner();
-            
-            for(int i = 0; i < controlledCars; i++)
-            {
-
-                cars[i].gameObject.SetActive(true);
-                cars[i].IsStarted = false;
-            }
-
-            for(int i = 0; i < carSpawners.Capacity; i++)
-                carSpawners[i].ResetCar();
-        }
-
-        public void SetSpawner()
-        {
-            for(int i = 0; i < 8; i++) //max cars
+            for(int i = 0; i < _maxCars; i++) // Reset all cars
             {
                 if(_currentControllingCar == i)
-                {
                     carSpawners[i].SetVisibility(true, true);
-                    cars[i].gameObject.SetActive(true);
-                    //carSpawners[i].SetSpawnerVisibility(true);
-                }
                 else
-                {
                     carSpawners[i].SetVisibility(false, false);
-                    cars[i].gameObject.SetActive(false);
-                    //carSpawners[i].SetSpawnerVisibility(false);
-                }
-                    
+                
+                carSpawners[i].spawnedCar.IsStarted = false;
+                carSpawners[i].ResetCar();       
             }
         }
-
     }
 }
 
 namespace CARGAME
 {
-    public enum ROTATION
+    public enum ROTATION //Player's car rotations
     {
         LEFT,
         RIGHT,
