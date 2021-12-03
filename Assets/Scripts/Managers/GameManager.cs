@@ -33,7 +33,11 @@ namespace CARGAME.Managers
         /// </summary>
         public void OnLevelCompleted()
         {
-            if(!loadLastPlayedScene) LoadGameLevel();
+            if(!loadLastPlayedScene) 
+            {
+                RestartLevel();
+                return;
+            }
 
             currentLevel++;
 
@@ -73,5 +77,10 @@ namespace CARGAME.Managers
         /// Load player level
         /// </summary>
         private void LoadGameLevel() { if(SceneManager.sceneCountInBuildSettings > currentLevel) SceneManager.LoadScene(currentLevel); }
+
+         /// <summary>
+        /// Restart game level
+        /// </summary>
+        private void RestartLevel() { SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
     }
 }
