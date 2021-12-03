@@ -5,8 +5,8 @@
   Every level, you have to move your car to the target position while not hitting any obstacle.
   When your car reaches the target, a new car spawns. The previous car will be in replay mode.
 ## Controls
-  Left button to rotate car left.
-  Right button to rotate car right.
+  Press the Left button to rotate the car left.
+  Press the Right button to rotate the car right.
 ## Game
 ![cargamevideo](https://user-images.githubusercontent.com/43264365/144533302-6d97d049-96f3-4cd5-8c21-b058203f6c08.gif)
 ## Editor
