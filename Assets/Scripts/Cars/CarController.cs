@@ -78,14 +78,22 @@ namespace CARGAME.Cars
 
         public void TurnLeftButtonPressed()
         {
-            if(!_isStarted) StartAllCars();
+            if(!_isStarted)
+            {
+                StartAllCars();
+                StartAllMovingObstacles();
+            }
 
             _leftButtonPressed = true;
         }
 
         public void TurnRightButtonPressed()
         {
-            if(!_isStarted) StartAllCars();
+            if(!_isStarted)
+            {
+                StartAllCars();
+                StartAllMovingObstacles();
+            }
 
             _rightButtonPressed = true;
         }
@@ -110,7 +118,13 @@ namespace CARGAME.Cars
 
                 carSpawners[i].spawnedCar.IsStarted = true;
             }
+        }
 
+        /// <summary>
+        /// Start all previously moved obstacles
+        /// </summary>
+        public void StartAllMovingObstacles()
+        {
             foreach (var item in FindObjectsOfType<Obstacles.MovingObstacle>())
                 item.StartObstacle();
         }
