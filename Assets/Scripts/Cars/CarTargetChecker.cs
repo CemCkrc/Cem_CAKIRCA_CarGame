@@ -11,7 +11,7 @@ namespace CARGAME.Cars
 
         private void OnTriggerEnter(Collider other) 
         {
-            CarController car = other.GetComponent<CarController>();
+            Car car = other.GetComponent<Car>();
 
             if(car?.carID == this.carID)
                 Managers.GameManager.Instance.OnCarReachedExit();

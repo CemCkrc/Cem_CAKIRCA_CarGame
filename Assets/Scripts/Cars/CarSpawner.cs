@@ -13,14 +13,12 @@ namespace CARGAME.Cars
 
         [Space(2)]
         [Header("Car Values")]
-        [Tooltip("Record data via using unique ID")]
-        public int carID = 0; //CarID
         public float carSpeed = 0; //Car speed
         public float carRotationSpeed = 0; //Car rotationSpeed
 
         [Space(10)]
-        public CarController carPrefab; //Car prefab
-        public CarController spawnedCar //Spawned car
+        public Car carPrefab; //Car prefab
+        public Car spawnedCar //Spawned car
         {
             get;
             private set;
@@ -61,9 +59,9 @@ namespace CARGAME.Cars
         /// </summary>
         private void SetupSpawner()
         {
-            _endPos.carID = carID;
+            _endPos.carID = spawnerID;
 
-            spawnedCar.carID = this.carID;
+            spawnedCar.carID = this.spawnerID;
             spawnedCar.carSpeed = this.carSpeed;
             spawnedCar.rotationSpeed = this.carRotationSpeed;
 

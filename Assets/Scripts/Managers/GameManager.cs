@@ -58,7 +58,7 @@ namespace CARGAME.Managers
                 item.ResetPosition();
 
             RecordManager.Recorder.ResetAllRecords();
-            FindObjectOfType<CarManager>().CurrentControllingCar++;    
+            FindObjectOfType<Cars.CarController>().CurrentControllingCar++;    
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace CARGAME.Managers
                 item.ResetPosition();
 
             RecordManager.Recorder.ResetAllRecords();
-            FindObjectOfType<CarManager>().ResetAllCars();  
+            FindObjectOfType<Cars.CarController>().ResetAllCars();  
         }
 
         /// <summary>

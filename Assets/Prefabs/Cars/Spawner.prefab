@@ -46,10 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnerID: 0
-  carID: 0
   carSpeed: 100
   carRotationSpeed: 100
-  carPrefab: {fileID: 7379373197179418784, guid: 084f6979f148610438254ea28c45e7cb, type: 3}
+  carPrefab: {fileID: 2287649019358918983, guid: 084f6979f148610438254ea28c45e7cb, type: 3}
   _normalCarColor: {r: 0.38431373, g: 0.7176471, b: 0.7921569, a: 1}
   _currentCarColor: {r: 0.9150943, g: 0.63369286, b: 0.42733178, a: 1}
 --- !u!1 &6623690907092528839
